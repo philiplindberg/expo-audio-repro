@@ -1,23 +1,25 @@
 import { View, StyleSheet, Button } from 'react-native'
 import { useAudioPlayer } from 'expo-audio'
+import { useEventListener } from 'expo'
+import { useState } from 'react'
 
 export default function App() {
-  const player = useAudioPlayer()
+  const player = useAudioPlayer(require('./assets/audio/iphone.mp3'))
+
+  const [playing, setPlaying] = useState(false)
+
+  useEventListener(player, 'playbackStatusUpdate', (status) => {
+    if (status.playing) setPlaying(true)
+    if (status.didJustFinish) setPlaying(false)
+  })
 
   return (
     <View style={styles.container}>
       <View style={styles.buttons}>
         <Button
-          title='Play Sound 1'
+          title={playing ? 'Playing...' : 'Play Sound'}
           onPress={() => {
-            player.replace(require('./assets/audio/iphone.mp3'))
-            player.play()
-          }}
-        />
-        <Button
-          title='Play Sound 2'
-          onPress={() => {
-            player.replace(require('./assets/audio/nokia.mp3'))
+            player.seekTo(0)
             player.play()
           }}
         />
